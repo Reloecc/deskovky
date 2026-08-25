@@ -366,6 +366,7 @@ h1, h2, h3, h4 {
    border-bottom: 2px solid var(--line);
    position: relative;
    padding-bottom: 2px;
+   overflow: hidden;
 }
 
 .tab {
@@ -705,17 +706,6 @@ h1, h2, h3, h4 {
       position: static;
       margin-bottom: 30px;
       padding: 16px;
-   }
-
-   .game-list {
-      display: flex;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      gap: 12px;
-   }
-
-   .game-button {
-      flex: 0 0 220px;
    }
 
    .game-button:hover {
