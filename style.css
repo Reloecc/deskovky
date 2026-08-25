@@ -169,12 +169,6 @@ h1, h2, h3, h4 {
    justify-content: space-between;
 }
 
-.selector h2::after {
-   content: '✦';
-   font-size: 13px;
-   color: var(--crimson-light);
-}
-
 .game-list {
    display: grid;
    gap: 10px;
