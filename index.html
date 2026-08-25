@@ -244,7 +244,7 @@
    }
 
    function loadGameList(index = 1) {
-      const src = `games/game-${index}.html`;
+      const src = `games/game-${index}.html?t=` + 20;
       if (gameCache[src]) {
          createGameButton(src, index, gameCache[src]);
          loadGameList(index + 1);
