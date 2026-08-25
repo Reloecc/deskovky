@@ -41,8 +41,56 @@
    const heroContainer = document.querySelector('#game-hero-container');
    const panelContainer = document.querySelector('#game-panel-container');
 
+   const validTabs = ['overview', 'rules', 'gallery', 'shops'];
+   let currentGameId = 'game-1';
    let currentTab = 'overview';
+   let loadedGameId = null;
    const gameCache = {};
+
+   function parseHash() {
+      const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      let gameId = null;
+      let tab = null;
+
+      if (hash) {
+         const parts = hash.split(/[\/\?&]/).filter(Boolean);
+         for (const part of parts) {
+            const lower = part.toLowerCase();
+            if (/^game-\d+$/i.test(lower)) {
+               gameId = lower;
+            } else if (/^tab=(.+)$/i.test(lower)) {
+               const val = lower.split('=')[1];
+               if (validTabs.includes(val)) tab = val;
+            } else if (validTabs.includes(lower)) {
+               tab = lower;
+            }
+         }
+
+         if (!gameId) {
+            const match = hash.match(/game-\d+/i);
+            if (match) {
+               gameId = match[0].toLowerCase();
+            }
+         }
+      }
+
+      return {
+         gameId: gameId || 'game-1',
+         tab: (tab && validTabs.includes(tab)) ? tab : 'overview'
+      };
+   }
+
+   function updateHash(gameId, tab, replace = false) {
+      const newHash = `#${gameId}/${tab}`;
+      if (window.location.hash !== newHash) {
+         if (replace) {
+            history.replaceState(null, '', newHash);
+            applyRoute();
+         } else {
+            window.location.hash = newHash;
+         }
+      }
+   }
 
    function selectTab(tabName) {
       currentTab = tabName;
@@ -86,7 +134,7 @@
       }
    }
 
-   function renderGame(htmlContent) {
+   function renderGame(htmlContent, gameId) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlContent, 'text/html');
       const hero = doc.querySelector('.game-hero');
@@ -102,13 +150,14 @@
          panelContainer.appendChild(panel);
       });
 
+      loadedGameId = gameId;
       selectTab(currentTab);
       initGallery();
    }
 
-   function loadGame(src) {
+   function loadGame(src, gameId) {
       if (gameCache[src]) {
-         renderGame(gameCache[src]);
+         renderGame(gameCache[src], gameId);
          return;
       }
 
@@ -117,7 +166,9 @@
       xhr.onload = function() {
          if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.responseText && xhr.responseText.trim().length > 0)) {
             gameCache[src] = xhr.responseText;
-            renderGame(xhr.responseText);
+            if (currentGameId === gameId) {
+               renderGame(xhr.responseText, gameId);
+            }
          } else {
             panelContainer.innerHTML = '<p class="empty-note">Failed to load game content.</p>';
          }
@@ -128,55 +179,80 @@
       xhr.send();
    }
 
-   function selectGame(button) {
+   function updateGameButtonsSelection() {
       const allButtons = gameListContainer.querySelectorAll('.game-button');
       allButtons.forEach(btn => {
-         btn.setAttribute('aria-selected', btn === button ? 'true' : 'false');
+         const isSelected = btn.dataset.gameId === currentGameId;
+         btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
       });
-      currentTab = 'overview';
-      loadGame(button.dataset.src || button.getAttribute('data-src'));
+   }
+
+   function applyRoute() {
+      const route = parseHash();
+      currentGameId = route.gameId;
+      currentTab = route.tab;
+
+      const targetHash = `#${currentGameId}/${currentTab}`;
+      if (window.location.hash !== targetHash) {
+         history.replaceState(null, '', targetHash);
+      }
+
+      updateGameButtonsSelection();
+
+      if (loadedGameId === currentGameId && panelContainer.children.length > 0) {
+         selectTab(currentTab);
+      } else {
+         const src = `games/${currentGameId}.html`;
+         loadGame(src, currentGameId);
+      }
+   }
+
+   function createGameButton(src, index, htmlContent) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      const heading = doc.querySelector('.game-hero h2') || doc.querySelector('h2');
+      const gameName = heading ? heading.textContent.trim() : '';
+      const gameId = `game-${index}`;
+
+      const button = document.createElement('button');
+      button.className = 'game-button';
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', gameId === currentGameId ? 'true' : 'false');
+      button.setAttribute('data-src', src);
+      button.setAttribute('data-game-id', gameId);
+
+      const numberSpan = document.createElement('span');
+      numberSpan.className = 'game-number';
+      numberSpan.textContent = String(index).padStart(2, '0');
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'game-name';
+      nameSpan.textContent = gameName;
+
+      button.appendChild(numberSpan);
+      button.appendChild(nameSpan);
+
+      button.addEventListener('click', () => {
+         updateHash(gameId, currentTab);
+      });
+
+      gameListContainer.appendChild(button);
    }
 
    function loadGameList(index = 1) {
       const src = `games/game-${index}.html`;
+      if (gameCache[src]) {
+         createGameButton(src, index, gameCache[src]);
+         loadGameList(index + 1);
+         return;
+      }
+
       const xhr = new XMLHttpRequest();
       xhr.open('GET', src);
       xhr.onload = function() {
          if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.responseText && xhr.responseText.trim().length > 0)) {
             gameCache[src] = xhr.responseText;
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(xhr.responseText, 'text/html');
-            const heading = doc.querySelector('.game-hero h2') || doc.querySelector('h2');
-            const gameName = heading ? heading.textContent.trim() : '';
-
-            const button = document.createElement('button');
-            button.className = 'game-button';
-            button.setAttribute('role', 'tab');
-            button.setAttribute('aria-selected', index === 1 ? 'true' : 'false');
-            button.setAttribute('data-src', src);
-
-            const numberSpan = document.createElement('span');
-            numberSpan.className = 'game-number';
-            numberSpan.textContent = String(index).padStart(2, '0');
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'game-name';
-            nameSpan.textContent = gameName;
-
-            button.appendChild(numberSpan);
-            button.appendChild(nameSpan);
-
-            button.addEventListener('click', () => {
-               selectGame(button);
-            });
-
-            gameListContainer.appendChild(button);
-
-            if (index === 1) {
-               renderGame(xhr.responseText);
-            }
-
+            createGameButton(src, index, xhr.responseText);
             loadGameList(index + 1);
          }
       };
@@ -188,10 +264,16 @@
 
    tabButtons.forEach(tab => {
       tab.addEventListener('click', () => {
-         selectTab(tab.dataset.tab);
+         const tabName = tab.dataset.tab;
+         if (validTabs.includes(tabName)) {
+            updateHash(currentGameId, tabName);
+         }
       });
    });
 
+   window.addEventListener('hashchange', applyRoute);
+
+   applyRoute();
    loadGameList(1);
 </script>
 </body>
