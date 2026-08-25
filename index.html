@@ -5,6 +5,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta name="description" content="A board game shortlist for game night.">
    <title>Game Night Shortlist</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
    <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,6 +34,7 @@
    </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script>
    const gameListContainer = document.querySelector('#game-list');
    const tabButtons = document.querySelectorAll('.tabs .tab');
@@ -58,6 +60,32 @@
       });
    }
 
+   function initGallery() {
+      const galleryItems = panelContainer.querySelectorAll('.gallery-item');
+      galleryItems.forEach(item => {
+         const img = item.querySelector('img');
+         const caption = item.querySelector('.gallery-caption');
+         if (img && !item.hasAttribute('data-src')) {
+            item.setAttribute('data-src', img.src);
+         }
+         if (!item.hasAttribute('data-fancybox')) {
+            item.setAttribute('data-fancybox', 'gallery');
+         }
+         if (!item.hasAttribute('data-caption')) {
+            if (caption) {
+               item.setAttribute('data-caption', caption.textContent.trim());
+            } else if (img && img.alt) {
+               item.setAttribute('data-caption', img.alt);
+            }
+         }
+      });
+
+      if (typeof Fancybox !== 'undefined') {
+         Fancybox.unbind('[data-fancybox="gallery"]');
+         Fancybox.bind('[data-fancybox="gallery"]', {});
+      }
+   }
+
    function renderGame(htmlContent) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlContent, 'text/html');
@@ -75,6 +103,7 @@
       });
 
       selectTab(currentTab);
+      initGallery();
    }
 
    function loadGame(src) {

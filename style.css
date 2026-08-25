@@ -161,7 +161,7 @@ h1 {
 }
 .game-hero h2 {
    margin: 10px 0 14px;
-   font-size: clamp(36px, 5vw, 62px);
+   font-size: 2rem;
    line-height: .95;
    letter-spacing: -.06em;
 }
@@ -177,9 +177,15 @@ h1 {
    align-self: stretch;
    min-height: 150px;
    color: var(--ink);
-   border: 1px solid var(--ink);
    background: var(--sage);
    transform: rotate(3deg);
+   overflow: hidden;
+}
+.game-stamp img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   display: block;
 }
 .stamp-inner {
    text-align: center;
@@ -250,6 +256,61 @@ h1 {
    font-size: 14px;
    line-height: 1.45;
 }
+.gallery-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 16px;
+}
+.gallery-item {
+   position: relative;
+   overflow: hidden;
+   background: var(--panel);
+   border: 1px solid var(--line);
+   cursor: pointer;
+}
+.gallery-item img {
+   display: block;
+   width: 100%;
+   height: 220px;
+   object-fit: cover;
+   transition: transform .3s ease;
+}
+.gallery-item:hover img {
+   transform: scale(1.03);
+}
+.gallery-caption {
+   padding: 10px 14px;
+   font-size: 13px;
+   color: var(--muted);
+   border-top: 1px solid var(--line);
+   background: rgba(255, 253, 248, .9);
+}
+.rules-content {
+   display: grid;
+   gap: 16px;
+   line-height: 1.6;
+   color: var(--ink);
+}
+.rules-content p {
+   margin: 0;
+   color: var(--muted);
+}
+.rules-block {
+   padding: 18px 20px;
+   background: rgba(255, 253, 248, .72);
+   border: 1px solid var(--line);
+}
+.rules-block h4 {
+   margin: 0 0 8px;
+   font-size: 16px;
+   color: var(--ink);
+}
+.rules-block p {
+   margin: 0;
+   font-size: 14px;
+   line-height: 1.55;
+   color: var(--muted);
+}
 .empty-note {
    padding: 22px 0;
    color: var(--muted);
@@ -293,7 +354,7 @@ h1 {
 }
 .shop-price {
    font-family: 'DM Mono', monospace;
-   font-weight: 600;
+   font-weight: 400;
    font-size: 18px;
    color: var(--ink);
    text-align: right;
@@ -331,7 +392,7 @@ footer {
    }
 
    h1 {
-      font-size: clamp(49px, 16vw, 76px);
+      font-size: clamp(49px, 16vw, 36px);
    }
 
    .layout {
@@ -373,7 +434,8 @@ footer {
       font-size: 14px;
    }
 
-   .placeholder-grid {
+   .placeholder-grid,
+   .gallery-grid {
       grid-template-columns: 1fr;
    }
 }
