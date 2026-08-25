@@ -282,7 +282,7 @@ h1, h2, h3, h4 {
    display: grid;
    grid-template-columns: 1fr 190px;
    gap: 32px;
-   align-items: center;
+   align-items: start;
    min-height: 245px;
    padding: 36px 38px;
    background: linear-gradient(135deg, rgba(22, 27, 37, 0.95) 0%, rgba(16, 19, 27, 0.98) 100%);
@@ -327,7 +327,6 @@ h1, h2, h3, h4 {
 .game-stamp {
    display: grid;
    place-items: center;
-   align-self: center;
    height: 190px;
    width: 100%;
    border-radius: var(--radius-sm);

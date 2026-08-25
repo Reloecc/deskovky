@@ -3,8 +3,8 @@
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="A board game shortlist for game night.">
-   <title>Game Night Shortlist</title>
+   <meta name="description" content="Výběr budoucích her">
+   <title>Výběr budoucích her</title>
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700;800;900&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -213,8 +213,8 @@
    function createGameButton(src, index, htmlContent) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlContent, 'text/html');
-      const heading = doc.querySelector('.game-hero h2') || doc.querySelector('h2');
-      const gameName = heading ? heading.textContent.trim() : '';
+      const heading = doc.querySelector('input.game-name').value || doc.querySelector('h2').textContent;
+      const gameName = heading || '';
       const gameId = `game-${index}`;
 
       const button = document.createElement('button');
