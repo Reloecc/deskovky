@@ -1,209 +1,169 @@
 <!doctype html>
-<html lang="en">
+<html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A board game shortlist for game night.">
-  <title>Game Night Shortlist</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
-    :root {
-      --ink: #20201d;
-      --muted: #726f66;
-      --paper: #f5f1e8;
-      --panel: #fffdf8;
-      --line: #d8d0c1;
-      --accent: #d8573f;
-      --accent-dark: #a83d2d;
-      --sage: #a7b8a0;
-      --yellow: #f0c76d;
-      --shadow: 0 18px 42px rgba(63, 54, 40, .11);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      color: var(--ink);
-      background-color: var(--paper);
-      background-image: radial-gradient(#d8d0c1 0.8px, transparent 0.8px);
-      background-size: 18px 18px;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    button { font: inherit; }
-    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
-    .topbar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 28px 0 38px; border-bottom: 1px solid var(--line);
-    }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: -.03em; }
-    .brand-mark {
-      display: grid; place-items: center; width: 38px; height: 38px;
-      color: var(--ink); background: var(--yellow); border: 1px solid var(--ink);
-      box-shadow: 3px 3px 0 var(--ink); font-size: 19px; transform: rotate(-5deg);
-    }
-    .eyebrow, .mono { font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; }
-    .eyebrow { color: var(--accent-dark); font-weight: 500; }
-    header { padding: 70px 0 48px; max-width: 790px; }
-    h1 { max-width: 690px; margin: 14px 0 18px; font-size: clamp(48px, 8vw, 92px); line-height: .92; letter-spacing: -.07em; }
-    .intro { max-width: 530px; color: var(--muted); font-size: 18px; line-height: 1.55; }
-    .layout { display: grid; grid-template-columns: 260px 1fr; gap: 54px; padding-bottom: 76px; }
-    .selector { position: sticky; top: 20px; align-self: start; }
-    .selector h2 { margin: 11px 0 18px; font-size: 20px; letter-spacing: -.04em; }
-    .game-list { display: grid; gap: 9px; }
-    .game-button {
-      display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: center;
-      width: 100%; padding: 12px 14px; color: var(--ink); text-align: left;
-      background: rgba(255, 253, 248, .58); border: 1px solid var(--line); cursor: pointer;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease;
-    }
-    .game-button:hover { transform: translateX(4px); border-color: var(--ink); }
-    .game-button[aria-selected="true"] { color: var(--panel); background: var(--ink); border-color: var(--ink); }
-    .game-number { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
-    .game-button[aria-selected="true"] .game-number { color: var(--yellow); }
-    .game-name { font-weight: 600; font-size: 14px; }
-    .content { min-width: 0; }
-    .game-hero {
-      display: grid; grid-template-columns: 1fr 180px; gap: 30px; align-items: end;
-      min-height: 245px; padding: 34px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow);
-    }
-    .game-hero h2 { margin: 10px 0 14px; font-size: clamp(36px, 5vw, 62px); line-height: .95; letter-spacing: -.06em; }
-    .game-description { max-width: 560px; margin: 0; color: var(--muted); line-height: 1.5; }
-    .game-stamp { display: grid; place-items: center; align-self: stretch; min-height: 150px; color: var(--ink); border: 1px solid var(--ink); background: var(--sage); transform: rotate(3deg); }
-    .stamp-inner { text-align: center; }
-    .stamp-icon { display: block; margin-bottom: 8px; font-size: 44px; }
-    .tabs { display: flex; gap: 24px; margin: 30px 0 0; border-bottom: 1px solid var(--line); }
-    .tab { position: relative; padding: 0 0 13px; color: var(--muted); background: none; border: 0; cursor: pointer; font-weight: 600; }
-    .tab::after { content: ''; position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; background: transparent; }
-    .tab:hover, .tab[aria-selected="true"] { color: var(--ink); }
-    .tab[aria-selected="true"]::after { background: var(--accent); }
-    .tab-panel { padding-top: 30px; animation: reveal .35s ease both; }
-    .tab-panel h3 { margin: 0 0 16px; font-size: 25px; letter-spacing: -.04em; }
-    .placeholder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .placeholder {
-      min-height: 130px; padding: 20px; background: rgba(255, 253, 248, .72); border: 1px dashed var(--line);
-    }
-    .placeholder strong { display: block; margin-bottom: 10px; font-size: 15px; }
-    .placeholder p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
-    .empty-note { padding: 22px 0; color: var(--muted); line-height: 1.6; }
-    footer { padding: 22px 0 35px; color: var(--muted); border-top: 1px solid var(--line); font-size: 13px; }
-    @keyframes reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 720px) {
-      .shell { width: min(100% - 28px, 560px); }
-      .topbar { padding-top: 18px; padding-bottom: 24px; }
-      header { padding: 48px 0 34px; }
-      h1 { font-size: clamp(49px, 16vw, 76px); }
-      .layout { display: block; }
-      .selector { position: static; margin-bottom: 34px; }
-      .game-list { display: flex; overflow-x: auto; padding: 2px 2px 12px; }
-      .game-button { flex: 0 0 170px; }
-      .game-hero { grid-template-columns: 1fr; padding: 24px; }
-      .game-stamp { min-height: 110px; }
-      .tabs { gap: 18px; overflow-x: auto; }
-      .tab { flex: 0 0 auto; font-size: 14px; }
-      .placeholder-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="A board game shortlist for game night.">
+   <title>Game Night Shortlist</title>
+   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="shell">
-    <nav class="topbar" aria-label="Main navigation">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">+</span><span>Game night / 01</span></div>
-      <span class="mono">Shortlist</span>
-    </nav>
+<div class="shell">
+   <br>
 
-    <header>
-      <div class="eyebrow">A shared table</div>
-      <h1>Choose your next game.</h1>
-      <p class="intro">A small collection of possibilities for tonight. Pick a title to see its notes, rules, and the details that matter before the first turn.</p>
-    </header>
-
-    <main class="layout">
+   <main class="layout">
       <aside class="selector" aria-label="Board game selector">
-        <div class="eyebrow">The shelf</div>
-        <h2>Games in the running</h2>
-        <div class="game-list" id="game-list" role="tablist" aria-label="Choose a board game"></div>
+         <h2>Vhodné hry</h2>
+         <div class="game-list" id="game-list" role="tablist" aria-label="Choose a board game">
+         </div>
       </aside>
 
       <section class="content" aria-live="polite">
-        <div class="game-hero">
-          <div>
-            <div class="eyebrow" id="game-category">Placeholder game</div>
-            <h2 id="game-title">Game title goes here</h2>
-            <p class="game-description" id="game-description">Replace this with a short, inviting summary of the game.</p>
-          </div>
-          <div class="game-stamp" id="game-stamp" aria-hidden="true"><div class="stamp-inner"><span class="stamp-icon">◎</span><span class="mono">Your art here</span></div></div>
-        </div>
+         <div id="game-hero-container"></div>
 
-        <div class="tabs" role="tablist" aria-label="Game information">
-          <button class="tab" id="tab-overview" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Overview</button>
-          <button class="tab" id="tab-rules" role="tab" aria-selected="false" aria-controls="panel-rules" data-tab="rules">How to play</button>
-          <button class="tab" id="tab-details" role="tab" aria-selected="false" aria-controls="panel-details" data-tab="details">Details</button>
-        </div>
-        <div id="tab-content" class="tab-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-overview"></div>
+         <div class="tabs" role="tablist" aria-label="Game information">
+            <button class="tab" role="tab" aria-selected="true" data-tab="overview">Přehled</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="rules">Jak se hraje</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="gallery">Galerie</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="shops">Obchody</button>
+         </div>
+
+         <div id="game-panel-container"></div>
       </section>
-    </main>
+   </main>
+</div>
 
-    <footer><span class="mono">Built for choosing well</span></footer>
-  </div>
+<script>
+   const gameListContainer = document.querySelector('#game-list');
+   const tabButtons = document.querySelectorAll('.tabs .tab');
+   const heroContainer = document.querySelector('#game-hero-container');
+   const panelContainer = document.querySelector('#game-panel-container');
 
-  <script>
-    // Replace these objects with the games you want to present.
-    const games = [
-      { title: 'Game title one', category: 'Strategy / placeholder', icon: '01', color: '#a7b8a0', description: 'Add a quick description here: what makes this game worth bringing to the table?', overview: ['Player count', 'Play time'], rules: 'Add the short version of the rules and the main objective here.', details: 'Add age range, complexity, box contents, or anything else your group should know.' },
-      { title: 'Game title two', category: 'Party / placeholder', icon: '02', color: '#f0c76d', description: 'Give your friends the feeling of this game in one or two clear sentences.', overview: ['Player count', 'Play time'], rules: 'Explain how a round works, then note anything that is useful to know before playing.', details: 'Use this space for your own notes, links, or a verdict after playing.' },
-      { title: 'Game title three', category: 'Cooperative / placeholder', icon: '03', color: '#d99a8e', description: 'A third option for the evening. Replace this placeholder with your own recommendation.', overview: ['Player count', 'Play time'], rules: 'Describe the turn structure and the win condition here.', details: 'Add setup notes, expansions, or any house rules here.' }
-    ];
+   let currentTab = 'overview';
+   const gameCache = {};
 
-    const list = document.querySelector('#game-list');
-    const title = document.querySelector('#game-title');
-    const category = document.querySelector('#game-category');
-    const description = document.querySelector('#game-description');
-    const stamp = document.querySelector('#game-stamp');
-    const tabContent = document.querySelector('#tab-content');
-    let selectedGame = 0;
-    let selectedTab = 'overview';
+   function selectTab(tabName) {
+      currentTab = tabName;
+      tabButtons.forEach(tab => {
+         tab.setAttribute('aria-selected', tab.dataset.tab === tabName ? 'true' : 'false');
+      });
 
-    function renderGameList() {
-      list.innerHTML = games.map((game, index) => `
-        <button class="game-button" role="tab" aria-selected="${index === selectedGame}" aria-controls="game-information" data-game="${index}">
-          <span class="game-number">${game.icon}</span><span class="game-name">${game.title}</span>
-        </button>`).join('');
-      list.querySelectorAll('[data-game]').forEach(button => button.addEventListener('click', () => {
-        selectedGame = Number(button.dataset.game);
-        selectedTab = 'overview';
-        render();
-      }));
-    }
+      const panels = panelContainer.querySelectorAll('.tab-panel');
+      panels.forEach(panel => {
+         if (panel.dataset.panel === tabName) {
+            panel.removeAttribute('hidden');
+         } else {
+            panel.setAttribute('hidden', '');
+         }
+      });
+   }
 
-    function renderPanel(game) {
-      if (selectedTab === 'overview') {
-        tabContent.innerHTML = `<h3>The short version</h3><div class="placeholder-grid">${game.overview.map(item => `<div class="placeholder"><strong>${item}</strong><p>Add a value here</p></div>`).join('')}</div>`;
-      } else if (selectedTab === 'rules') {
-        tabContent.innerHTML = `<h3>What happens at the table?</h3><p class="empty-note">${game.rules}</p>`;
-      } else {
-        tabContent.innerHTML = `<h3>Useful details</h3><p class="empty-note">${game.details}</p>`;
+   function renderGame(htmlContent) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      const hero = doc.querySelector('.game-hero');
+      const panels = doc.querySelectorAll('.tab-panel');
+
+      heroContainer.innerHTML = '';
+      if (hero) {
+         heroContainer.appendChild(hero);
       }
-      tabContent.setAttribute('aria-labelledby', `tab-${selectedTab}`);
-    }
 
-    function render() {
-      const game = games[selectedGame];
-      renderGameList();
-      title.textContent = game.title;
-      category.textContent = game.category;
-      description.textContent = game.description;
-      stamp.style.background = game.color;
-      document.querySelectorAll('[data-tab]').forEach(tab => tab.setAttribute('aria-selected', tab.dataset.tab === selectedTab));
-      renderPanel(game);
-    }
+      panelContainer.innerHTML = '';
+      panels.forEach(panel => {
+         panelContainer.appendChild(panel);
+      });
 
-    document.querySelectorAll('[data-tab]').forEach(tab => tab.addEventListener('click', () => {
-      selectedTab = tab.dataset.tab;
-      render();
-    }));
-    render();
-  </script>
+      selectTab(currentTab);
+   }
+
+   function loadGame(src) {
+      if (gameCache[src]) {
+         renderGame(gameCache[src]);
+         return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', src);
+      xhr.onload = function() {
+         if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.responseText && xhr.responseText.trim().length > 0)) {
+            gameCache[src] = xhr.responseText;
+            renderGame(xhr.responseText);
+         } else {
+            panelContainer.innerHTML = '<p class="empty-note">Failed to load game content.</p>';
+         }
+      };
+      xhr.onerror = function() {
+         panelContainer.innerHTML = '<p class="empty-note">Error loading game content.</p>';
+      };
+      xhr.send();
+   }
+
+   function selectGame(button) {
+      const allButtons = gameListContainer.querySelectorAll('.game-button');
+      allButtons.forEach(btn => {
+         btn.setAttribute('aria-selected', btn === button ? 'true' : 'false');
+      });
+      currentTab = 'overview';
+      loadGame(button.dataset.src || button.getAttribute('data-src'));
+   }
+
+   function loadGameList(index = 1) {
+      const src = `games/game-${index}.html`;
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', src);
+      xhr.onload = function() {
+         if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.responseText && xhr.responseText.trim().length > 0)) {
+            gameCache[src] = xhr.responseText;
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xhr.responseText, 'text/html');
+            const heading = doc.querySelector('.game-hero h2') || doc.querySelector('h2');
+            const gameName = heading ? heading.textContent.trim() : '';
+
+            const button = document.createElement('button');
+            button.className = 'game-button';
+            button.setAttribute('role', 'tab');
+            button.setAttribute('aria-selected', index === 1 ? 'true' : 'false');
+            button.setAttribute('data-src', src);
+
+            const numberSpan = document.createElement('span');
+            numberSpan.className = 'game-number';
+            numberSpan.textContent = String(index).padStart(2, '0');
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'game-name';
+            nameSpan.textContent = gameName;
+
+            button.appendChild(numberSpan);
+            button.appendChild(nameSpan);
+
+            button.addEventListener('click', () => {
+               selectGame(button);
+            });
+
+            gameListContainer.appendChild(button);
+
+            if (index === 1) {
+               renderGame(xhr.responseText);
+            }
+
+            loadGameList(index + 1);
+         }
+      };
+      xhr.onerror = function() {
+         // Stop loading next games on error
+      };
+      xhr.send();
+   }
+
+   tabButtons.forEach(tab => {
+      tab.addEventListener('click', () => {
+         selectTab(tab.dataset.tab);
+      });
+   });
+
+   loadGameList(1);
+</script>
 </body>
 </html>
